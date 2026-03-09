@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-//this is for edge case in nextjs 
+//nextjs runs on edge runtime 
 let isConnected = false;
 
 export default async function connectDb(){
