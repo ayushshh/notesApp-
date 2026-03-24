@@ -1,7 +1,9 @@
 "use client"
 import React, { useState } from 'react'
+import { toast } from 'react-hot-toast';   // ✅ FIX 1: use named import instead of default
 
-const NotesClient = () => {
+const NotesClient = ({initialNotes}) => {
+    const [notes, setNotes] = useState(initialNotes);
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState("");
     const [title, setTitle] = useState("");
@@ -18,10 +20,20 @@ const NotesClient = () => {
                 body: JSON.stringify({title, content})
             })
             const result = await response.json();
-            console.log(result);
-            setLoading(false);
+            if(result.success){
+                // ✅ FIX 2: use functional state update to avoid stale closure
+                setNotes(prevNotes => [result.data, ...prevNotes])  
+                toast.success("Note created successfully!!")
+                setTitle("")
+                setContent("")
+            } else {
+                toast.error("Failed to create note");   // ✅ FIX 3: handle unsuccessful response
+            }
         } catch (error) {
             console.error("Error creating note : ", error)
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);   // ✅ FIX 4: ensure loading resets in all cases
         }
     }
 
@@ -39,6 +51,31 @@ const NotesClient = () => {
                 </button>
             </div>
         </form>
+        <div className='space-y-4'>
+            <h2 className='text-xl font-semibold'>Your Notes ({notes.length})</h2>
+            {
+                notes.length === 0 ? (
+                    <p className='text-gray-500'>No Notes yet. Create your first Note above.</p>
+                ) : (
+                    notes.map((note) => (
+                        <div key={note._id} className='bg-white p-6 rounded-lg shadow-md'>
+                            <div className='flex justify-between items-start mb-2'>
+                                <h3 className='text-lg font-semibold'>{note.title}</h3>
+                                <div className='flex gap-2'>
+                                    <button className='text-blue-500 hover:text-blue-600 text-sm'>
+                                        Edit
+                                    </button>
+                                    <button className='text-red-500 hover:text-red-600 text-sm'>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <p className='text-gray-700 mb-2'>{note.content}</p>
+                        </div>
+                    ))
+                )
+            }
+        </div>
     </div>
   )
 }

@@ -8,12 +8,12 @@ export async function GET() {
         await connectDb();
         const notes = await Note.find({}).sort({createdAt : -1})
         return NextResponse.json({
-            sucess : true,
+            success : true,
             data : notes
         }, {status : 200})
     } catch (error) {
         return NextResponse.json({
-            sucess : false,
+            success : false,
             data : error
         }, {status : 400})
     }
@@ -26,12 +26,12 @@ export async function POST(request: NextRequest){
         const notes = await Note.create(body);
 
         return NextResponse.json({
-            sucess : true,
+            success : true,
             data : notes
         }, {status : 200})
     } catch (error : unknown) {
         return NextResponse.json({
-            sucess : false,
+            success : false,
             data : error
         }, {status : 400})
     }
